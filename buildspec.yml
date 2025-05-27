@@ -1,0 +1,39 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in and installing dependencies...
+      - echo Build started on `date`
+      - echo Node.js version
+      - node --version
+      - echo npm version
+      - npm --version
+      - echo Installing dependencies...
+      - npm ci
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the React application...
+      - npm run build
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Syncing to S3...
+      - aws s3 sync build/ s3://$S3_BUCKET --delete --cache-control max-age=31536000,public
+      - aws s3 cp s3://$S3_BUCKET/index.html s3://$S3_BUCKET/index.html --metadata-directive REPLACE --cache-control no-cache,no-store,must-revalidate --content-type text/html
+      - echo Invalidating CloudFront...
+      - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
+      - echo Deployment completed successfully
+
+artifacts:
+  files:
+    - "**/*"
+  base-directory: build
+  name: BuildArtifact
+
+cache:
+  paths:
+    - "node_modules/**/*"
