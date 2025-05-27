@@ -7,9 +7,9 @@ phases:
     commands:
       - echo "Installing dependencies..."
       # Add these lines to clean up before npm ci
-      - npm cache clean --force
-      - rm -rf node_modules
-      - rm package-lock.json # This is important for npm ci issues
+      # - npm cache clean --force
+      # - rm -rf node_modules
+      # - rm package-lock.json # This is important for npm ci issues
 
   pre_build:
     commands:
