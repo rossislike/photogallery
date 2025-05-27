@@ -1,6 +1,16 @@
 version: 0.2
 
 phases:
+  install:
+    runtime-versions:
+      nodejs: 18 # Or 20, or a version compatible with your project
+    commands:
+      - echo "Installing dependencies..."
+      # Add these lines to clean up before npm ci
+      - npm cache clean --force
+      - rm -rf node_modules
+      - rm package-lock.json # This is important for npm ci issues
+
   pre_build:
     commands:
       - echo Logging in and installing dependencies...
