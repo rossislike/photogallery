@@ -18,11 +18,12 @@ resource "aws_iam_role" "codepipeline" {
 
   tags = var.tags
 }
-
+# 
 resource "aws_codestarconnections_connection" "github" {
   name          = "${var.project_name}-${var.environment}-github"
   provider_type = "GitHub"
   tags          = var.tags
+  # Must be updated through the console 
 }
 
 # IAM Policy for CodePipeline
