@@ -62,9 +62,9 @@ resource "aws_iam_role_policy" "codebuild" {
 
 # CodeBuild Project
 resource "aws_codebuild_project" "build" {
-  name          = "${var.project_name}-${var.environment}-build"
-  description   = "Build project for ${var.project_name}"
-  service_role  = aws_iam_role.codebuild.arn
+  name         = "${var.project_name}-${var.environment}-build"
+  description  = "Build project for ${var.project_name}"
+  service_role = aws_iam_role.codebuild.arn
 
   artifacts {
     type = "CODEPIPELINE"
@@ -73,7 +73,7 @@ resource "aws_codebuild_project" "build" {
   environment {
     compute_type                = "BUILD_GENERAL1_SMALL"
     image                       = "aws/codebuild/standard:5.0"
-    type                       = "LINUX_CONTAINER"
+    type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
 
     environment_variable {
@@ -93,12 +93,12 @@ resource "aws_codebuild_project" "build" {
   }
 
   source {
-    type = "CODEPIPELINE"
+    type      = "CODEPIPELINE"
     buildspec = "buildspec.yml"
   }
 
   cache {
-    type  = "S3"
+    type     = "S3"
     location = "${aws_s3_bucket.artifacts.bucket}/cache"
   }
 

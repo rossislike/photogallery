@@ -1,5 +1,6 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Search, Home, Plus } from "lucide-react"
+import { getPhotos } from "./utils/api"
 
 const PhotoGallery = () => {
   const [searchTerm, setSearchTerm] = useState("")
@@ -60,6 +61,12 @@ const PhotoGallery = () => {
   const filteredPhotos = photos.filter((photo) =>
     photo.title.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  useEffect(() => {
+    getPhotos().then((data) => {
+      console.log(data)
+    })
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

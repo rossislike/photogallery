@@ -1,7 +1,7 @@
 resource "random_string" "bucket_suffix" {
   length  = 4
   special = false
-  upper = false
+  upper   = false
 }
 
 locals {

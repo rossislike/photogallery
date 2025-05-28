@@ -20,16 +20,16 @@ resource "aws_cloudfront_distribution" "distribution" {
     origin_path              = "/dist"
   }
 
-#   origin {
-#     domain_name = replace(aws_apigatewayv2_api.coffee_shop_api.api_endpoint, "https://", "")
-#     origin_id   = "api_gateway"
-#     custom_origin_config {
-#       http_port              = 80
-#       https_port             = 443
-#       origin_protocol_policy = "https-only"
-#       origin_ssl_protocols   = ["TLSv1.2"]
-#     }
-#   }
+  #   origin {
+  #     domain_name = replace(aws_apigatewayv2_api.coffee_shop_api.api_endpoint, "https://", "")
+  #     origin_id   = "api_gateway"
+  #     custom_origin_config {
+  #       http_port              = 80
+  #       https_port             = 443
+  #       origin_protocol_policy = "https-only"
+  #       origin_ssl_protocols   = ["TLSv1.2"]
+  #     }
+  #   }
 
 
   default_cache_behavior {
@@ -46,21 +46,21 @@ resource "aws_cloudfront_distribution" "distribution" {
     cache_policy_id = "b2884449-e4de-46a7-ac36-70bc7f1ddd6d"
   }
 
-#   ordered_cache_behavior {
-#     path_pattern           = "/coffee*"
-#     target_origin_id       = "api_gateway"
-#     allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-#     cached_methods         = ["GET", "HEAD"]
-#     min_ttl                = 0
-#     viewer_protocol_policy = "redirect-to-https"
-#     default_ttl            = 3600
-#     max_ttl                = 86400
-#     compress               = true
+  #   ordered_cache_behavior {
+  #     path_pattern           = "/coffee*"
+  #     target_origin_id       = "api_gateway"
+  #     allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+  #     cached_methods         = ["GET", "HEAD"]
+  #     min_ttl                = 0
+  #     viewer_protocol_policy = "redirect-to-https"
+  #     default_ttl            = 3600
+  #     max_ttl                = 86400
+  #     compress               = true
 
 
-#     cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
-#     origin_request_policy_id = "b689b0a8-53d0-40ab-baf2-68738e2966ac"
-#   }
+  #     cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
+  #     origin_request_policy_id = "b689b0a8-53d0-40ab-baf2-68738e2966ac"
+  #   }
 
   restrictions {
     geo_restriction {
