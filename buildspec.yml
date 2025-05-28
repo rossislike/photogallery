@@ -32,6 +32,7 @@ phases:
     commands:
       - echo Build completed on `date`
       - echo Syncing to S3...
+      - aws s3 rm s3://$S3_BUCKET --recursive
       - aws s3 sync dist/ s3://$S3_BUCKET/dist --delete --cache-control max-age=31536000,public
       - aws s3 cp s3://$S3_BUCKET/dist/index.html s3://$S3_BUCKET/dist/index.html --metadata-directive REPLACE --cache-control no-cache,no-store,must-revalidate --content-type text/html
       - echo Invalidating CloudFront...
