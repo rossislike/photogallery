@@ -81,10 +81,10 @@ resource "aws_codebuild_project" "build" {
       value = aws_s3_bucket.website.bucket
     }
 
-    # environment_variable {
-    #   name  = "CLOUDFRONT_DISTRIBUTION_ID"
-    #   value = aws_cloudfront_distribution.website.id
-    # }
+    environment_variable {
+      name  = "CLOUDFRONT_DISTRIBUTION_ID"
+      value = aws_cloudfront_distribution.distribution.id
+    }
 
     environment_variable {
       name  = "ENVIRONMENT"
