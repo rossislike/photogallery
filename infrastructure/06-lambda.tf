@@ -81,3 +81,11 @@ resource "aws_lambda_function" "get_photos" {
     }
   }
 }
+
+resource "aws_lambda_permission" "allow_get" {
+    statement_id  = "AllowAPIGatewayInvokeGetPhotos"
+    action        = "lambda:InvokeFunction"
+    function_name = aws_lambda_function.get_photos.function_name
+    principal     = "apigateway.amazonaws.com"
+    source_arn    = "${aws_apigatewayv2_api.photo_gallery.execution_arn}/*/*"
+}
