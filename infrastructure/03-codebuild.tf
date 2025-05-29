@@ -91,8 +91,9 @@ resource "aws_codebuild_project" "build" {
       value = var.environment
     }
     environment_variable {
-      name  = "API_URL"
-      value = "https://${aws_cloudfront_distribution.distribution.domain_name}"
+      name  = "VITE_API_URL"
+      value = aws_apigatewayv2_api.photo_gallery.api_endpoint
+      # value = "https://${aws_cloudfront_distribution.distribution.domain_name}"
     }
   }
 
