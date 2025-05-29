@@ -11,13 +11,13 @@ output "cloudfront_distribution_domain_name" {
 }
 
 output "cognito_user_pool_id" {
-  value = aws_cognito_user_pool.photo_gallery.id
+  value = aws_cognito_user_pool.pool.id
 }
 
 output "cognito_user_pool_client_id" {
-  value = aws_cognito_user_pool_client.photo_gallery.id
+  value = aws_cognito_user_pool_client.client.id
 }
 
 output "cognito_user_pool_domain" {
-  value = "https://${aws_cognito_user_pool_domain.photo_gallery.domain}.auth.us-east-1.amazoncognito.com"
+  value = "https://${aws_cognito_user_pool_domain.domain.domain}.auth.us-east-1.amazoncognito.com"
 }

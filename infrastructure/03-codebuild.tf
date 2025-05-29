@@ -99,12 +99,12 @@ resource "aws_codebuild_project" "build" {
 
     environment_variable {
       name  = "VITE_USER_POOL_ID"
-      value = aws_cognito_user_pool.photo_gallery.id
+      value = aws_cognito_user_pool.pool.id
     }
 
     environment_variable {
       name  = "VITE_CLIENT_ID"
-      value = aws_cognito_user_pool_client.photo_gallery.id
+      value = aws_cognito_user_pool_client.client.id
     }
     environment_variable {
       name  = "VITE_REDIRECT_URI"
@@ -112,7 +112,7 @@ resource "aws_codebuild_project" "build" {
     }
     environment_variable {
       name  = "VITE_COGNITO_DOMAIN"
-      value = "https://${aws_cognito_user_pool_domain.photo_gallery.domain}.auth.us-east-1.amazoncognito.com"
+      value = "https://${aws_cognito_user_pool_domain.domain.domain}.auth.us-east-1.amazoncognito.com"
     }
   }
 
