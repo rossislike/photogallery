@@ -4,5 +4,8 @@ output "api_gateway_endpoint" {
 
 
 output "cloudfront_distribution_id" {
-  value = "https://${aws_cloudfront_distribution.distribution.id}"
+  value = aws_cloudfront_distribution.distribution.id
+}
+output "cloudfront_distribution_domain_name" {
+  value = "https://${aws_cloudfront_distribution.distribution.domain_name}"
 }

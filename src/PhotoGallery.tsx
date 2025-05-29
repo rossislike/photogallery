@@ -32,12 +32,6 @@ const PhotoGallery = () => {
       date: "2024-03-05",
     },
     {
-      id: 5,
-      url: "https://images.unsplash.com/photo-1418065460487-3051ac5cc4c0?w=400&h=300&fit=crop",
-      title: "Desert Dunes",
-      date: "2024-03-01",
-    },
-    {
       id: 6,
       url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
       title: "Winter Lake",

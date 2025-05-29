@@ -90,6 +90,10 @@ resource "aws_codebuild_project" "build" {
       name  = "ENVIRONMENT"
       value = var.environment
     }
+    environment_variable {
+      name  = "API_URL"
+      value = "https://${aws_cloudfront_distribution.distribution.domain_name}"
+    }
   }
 
   source {
