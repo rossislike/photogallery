@@ -2,54 +2,54 @@ import { useEffect, useState } from "react"
 import { Search, Home, Plus } from "lucide-react"
 import { getPhotos } from "./utils/api"
 
+const initialData = [
+  {
+    id: 1,
+    url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
+    title: "Mountain Sunset",
+    date: "2024-03-15",
+  },
+  {
+    id: 2,
+    url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop",
+    title: "Forest Path",
+    date: "2024-03-10",
+  },
+  {
+    id: 3,
+    url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop",
+    title: "Ocean Waves",
+    date: "2024-03-08",
+  },
+  {
+    id: 4,
+    url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
+    title: "City Lights",
+    date: "2024-03-05",
+  },
+  {
+    id: 5,
+    url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
+    title: "Winter Lake",
+    date: "2024-02-28",
+  },
+  {
+    id: 6,
+    url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop",
+    title: "Flower Garden",
+    date: "2024-02-25",
+  },
+  {
+    id: 7,
+    url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop",
+    title: "Rocky Coast",
+    date: "2024-02-20",
+  },
+]
 const PhotoGallery = () => {
   const [searchTerm, setSearchTerm] = useState("")
-
+  const [photos, setPhotos] = useState(initialData)
   // Sample photo data
-  const photos = [
-    {
-      id: 1,
-      url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
-      title: "Mountain Sunset",
-      date: "2024-03-15",
-    },
-    {
-      id: 2,
-      url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop",
-      title: "Forest Path",
-      date: "2024-03-10",
-    },
-    {
-      id: 3,
-      url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop",
-      title: "Ocean Waves",
-      date: "2024-03-08",
-    },
-    {
-      id: 4,
-      url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
-      title: "City Lights",
-      date: "2024-03-05",
-    },
-    {
-      id: 6,
-      url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
-      title: "Winter Lake",
-      date: "2024-02-28",
-    },
-    {
-      id: 7,
-      url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop",
-      title: "Flower Garden",
-      date: "2024-02-25",
-    },
-    {
-      id: 8,
-      url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop",
-      title: "Rocky Coast",
-      date: "2024-02-20",
-    },
-  ]
 
   // Filter photos based on search term
   const filteredPhotos = photos.filter((photo) =>
@@ -62,6 +62,18 @@ const PhotoGallery = () => {
     })
   }, [])
 
+  const handleAddPhoto = async () => {
+    const response = await getPhotos()
+    console.log(response)
+    const newPhoto = {
+      id: photos.length + 1,
+      url: response,
+      title: `New Photo ${photos.length + 1}`,
+      date: new Date().toISOString().split("T")[0], // Current date in YYYY-MM-DD format
+    }
+
+    setPhotos([...photos, newPhoto])
+  }
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
@@ -78,7 +90,10 @@ const PhotoGallery = () => {
               <span>Home</span>
             </button>
             <span className="text-gray-400">|</span>
-            <button className="flex items-center space-x-1 hover:text-blue-800 transition-colors">
+            <button
+              className="flex items-center space-x-1 hover:text-blue-800 transition-colors"
+              onClick={handleAddPhoto}
+            >
               <Plus size={16} />
               <span>Add Photo</span>
             </button>

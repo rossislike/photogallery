@@ -1,8 +1,8 @@
 import { createRoot } from "react-dom/client"
 import "./index.css"
 import App from "./App.tsx"
-import { AuthProvider } from "react-oidc-context"
 import { Route, BrowserRouter, Routes } from "react-router-dom"
+import { AuthProvider } from "react-oidc-context"
 
 const USER_POOL_ID = import.meta.env.VITE_USER_POOL_ID
 const CLIENT_ID = import.meta.env.VITE_CLIENT_ID
@@ -25,3 +25,11 @@ createRoot(document.getElementById("root")!).render(
     </AuthProvider>
   </BrowserRouter>
 )
+
+// createRoot(document.getElementById("root")!).render(
+//   <BrowserRouter>
+//     <Routes>
+//       <Route path="/" element={<App />} />
+//     </Routes>
+//   </BrowserRouter>
+// )

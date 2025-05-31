@@ -1,4 +1,3 @@
-
 resource "aws_cloudfront_origin_access_control" "origin_access_control" {
   name                              = "${var.project_name}-client"
   description                       = "${var.project_name}-client"

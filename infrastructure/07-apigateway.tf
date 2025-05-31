@@ -2,7 +2,11 @@ resource "aws_apigatewayv2_api" "photo_gallery" {
   name          = "${var.project_name}-api"
   protocol_type = "HTTP"
   cors_configuration {
-    allow_origins = ["https://photogallery.rumothy.com"]
+    allow_origins = [
+      "http://localhost:5173",
+      "https://photogallery.rumothy.com",
+      "https://dd2oc3pa7ypmy.cloudfront.net"
+    ]
     allow_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     allow_headers = ["Content-Type", "Authorization"]
   }
@@ -31,7 +35,7 @@ resource "aws_apigatewayv2_route" "get_photos" {
 }
 
 
-resource "aws_apigatewayv2_authorizer" "photo_gallery" {
+resource "aws_apigatewayv2_authorizer" "photo_gallery" {  
   api_id          = aws_apigatewayv2_api.photo_gallery.id
   name            = "Cognito-PhotoGallery"
   authorizer_type = "JWT"
