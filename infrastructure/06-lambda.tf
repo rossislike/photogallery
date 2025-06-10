@@ -35,18 +35,18 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "${aws_s3_bucket.website.arn}/*"
         ]
       },
-      #   {
-      #     Effect = "Allow"
-      #     Action = [
-      #       "dynamodb:GetItem",
-      #       "dynamodb:PutItem",
-      #       "dynamodb:UpdateItem",
-      #       "dynamodb:DeleteItem",
-      #       "dynamodb:Query",
-      #       "dynamodb:Scan"
-      #     ]
-      #     Resource = [aws_dynamodb_table.hec.arn]
-      #   }
+        {
+          Effect = "Allow"
+          Action = [
+            "dynamodb:GetItem",
+            "dynamodb:PutItem",
+            "dynamodb:UpdateItem",
+            "dynamodb:DeleteItem",
+            "dynamodb:Query",
+            "dynamodb:Scan"
+          ]
+          Resource = [aws_dynamodb_table.photogallery.arn]
+        }
     ]
   })
 }
@@ -62,6 +62,14 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
 }
 
 
+resource "aws_lambda_layer_version" "python_layer" {
+  filename            = "layer/layer.zip"
+  layer_name          = "${var.project_name}-layer"
+  description         = "Python dependencies layer"
+  compatible_runtimes = ["python3.13"]
+}
+
+####################################################
 resource "aws_lambda_function" "get_photos" {
   filename         = "lambdas/get_photos.zip"
   function_name    = "${var.project_name}-get-photos"
@@ -78,6 +86,7 @@ resource "aws_lambda_function" "get_photos" {
   environment {
     variables = {
       BUCKET_NAME = aws_s3_bucket.website.bucket
+      PHOTOS_TABLE_NAME = aws_dynamodb_table.photogallery.name
     }
   }
 }
@@ -86,6 +95,64 @@ resource "aws_lambda_permission" "allow_get" {
     statement_id  = "AllowAPIGatewayInvokeGetPhotos"
     action        = "lambda:InvokeFunction"
     function_name = aws_lambda_function.get_photos.function_name
+    principal     = "apigateway.amazonaws.com"
+    source_arn    = "${aws_apigatewayv2_api.photo_gallery.execution_arn}/*/*"
+}
+
+####################################################
+resource "aws_lambda_function" "post_photo" {
+  filename         = "lambdas/post_photo.zip"
+  function_name    = "${var.project_name}-post-photo"
+  source_code_hash = filebase64sha256("lambdas/post_photo.zip")
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "post_photo.lambda_handler"
+  runtime          = "python3.13"
+  layers           = [aws_lambda_layer_version.python_layer.arn]
+
+  logging_config {
+    log_group  = aws_cloudwatch_log_group.lambda_logs.name
+    log_format = "Text"
+  }
+  environment {
+    variables = {
+      PHOTOS_TABLE_NAME = aws_dynamodb_table.photogallery.name
+    }
+  }
+}
+
+resource "aws_lambda_permission" "allow_post_photo" {
+    statement_id  = "AllowAPIGatewayInvokePostPhoto"
+    action        = "lambda:InvokeFunction"
+    function_name = aws_lambda_function.post_photo.function_name
+    principal     = "apigateway.amazonaws.com"
+    source_arn    = "${aws_apigatewayv2_api.photo_gallery.execution_arn}/*/*"
+}
+
+####################################################
+resource "aws_lambda_function" "upload_photo" {
+  filename         = "lambdas/upload_photo.zip"
+  function_name    = "${var.project_name}-upload-photo"
+  source_code_hash = filebase64sha256("lambdas/upload_photo.zip")
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "upload_photo.lambda_handler"
+  runtime          = "python3.13"
+  layers           = [aws_lambda_layer_version.python_layer.arn]
+
+  logging_config {
+    log_group  = aws_cloudwatch_log_group.lambda_logs.name
+    log_format = "Text"
+  }
+  environment {
+    variables = {
+      BUCKET_NAME = aws_s3_bucket.website.bucket
+    }
+  }
+}
+
+resource "aws_lambda_permission" "allow_upload_photo" {
+    statement_id  = "AllowAPIGatewayInvokeUploadPhoto"
+    action        = "lambda:InvokeFunction"
+    function_name = aws_lambda_function.upload_photo.function_name
     principal     = "apigateway.amazonaws.com"
     source_arn    = "${aws_apigatewayv2_api.photo_gallery.execution_arn}/*/*"
 }

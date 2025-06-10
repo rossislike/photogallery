@@ -12,29 +12,6 @@ resource "aws_apigatewayv2_api" "photo_gallery" {
   }
 }
 
-resource "aws_apigatewayv2_stage" "photo_gallery" {
-  api_id      = aws_apigatewayv2_api.photo_gallery.id
-  name        = "$default"
-  auto_deploy = true
-}
-
-resource "aws_apigatewayv2_integration" "photo_gallery" {
-  api_id                 = aws_apigatewayv2_api.photo_gallery.id
-  integration_uri        = aws_lambda_function.get_photos.arn
-  integration_type       = "AWS_PROXY"
-  integration_method     = "POST"
-}
-
-resource "aws_apigatewayv2_route" "get_photos" {
-  api_id    = aws_apigatewayv2_api.photo_gallery.id
-  route_key = "GET /photos"
-  target    = "integrations/${aws_apigatewayv2_integration.photo_gallery.id}"
-
-  authorizer_id = aws_apigatewayv2_authorizer.photo_gallery.id
-  authorization_type = "JWT"
-}
-
-
 resource "aws_apigatewayv2_authorizer" "photo_gallery" {  
   api_id          = aws_apigatewayv2_api.photo_gallery.id
   name            = "Cognito-PhotoGallery"
@@ -46,3 +23,61 @@ resource "aws_apigatewayv2_authorizer" "photo_gallery" {
   identity_sources = ["$request.header.Authorization"]
 }
 
+
+resource "aws_apigatewayv2_stage" "photo_gallery" {
+  api_id      = aws_apigatewayv2_api.photo_gallery.id
+  name        = "$default"
+  auto_deploy = true
+}
+
+####################################################
+resource "aws_apigatewayv2_integration" "get_photos" {
+  api_id                 = aws_apigatewayv2_api.photo_gallery.id
+  integration_uri        = aws_lambda_function.get_photos.arn
+  integration_type       = "AWS_PROXY"
+  integration_method     = "POST"
+}
+
+resource "aws_apigatewayv2_route" "get_photos" {
+  api_id    = aws_apigatewayv2_api.photo_gallery.id
+  route_key = "GET /photos"
+  target    = "integrations/${aws_apigatewayv2_integration.get_photos.id}"
+
+  authorizer_id = aws_apigatewayv2_authorizer.photo_gallery.id
+  authorization_type = "JWT"
+}
+
+####################################################
+resource "aws_apigatewayv2_integration" "post_photo" {
+  api_id                 = aws_apigatewayv2_api.photo_gallery.id
+  integration_uri        = aws_lambda_function.post_photo.arn
+  integration_type       = "AWS_PROXY"
+  integration_method     = "POST"
+}
+
+resource "aws_apigatewayv2_route" "post_photo" {
+  api_id    = aws_apigatewayv2_api.photo_gallery.id
+  route_key = "POST /photos"
+  target    = "integrations/${aws_apigatewayv2_integration.post_photo.id}"
+
+  authorizer_id = aws_apigatewayv2_authorizer.photo_gallery.id
+  authorization_type = "JWT"
+}
+
+####################################################
+
+resource "aws_apigatewayv2_integration" "upload_photo" {
+  api_id                 = aws_apigatewayv2_api.photo_gallery.id
+  integration_uri        = aws_lambda_function.upload_photo.arn
+  integration_type       = "AWS_PROXY"
+  integration_method     = "POST"
+}
+
+resource "aws_apigatewayv2_route" "upload_photo" {
+  api_id    = aws_apigatewayv2_api.photo_gallery.id
+  route_key = "POST /upload"
+  target    = "integrations/${aws_apigatewayv2_integration.upload_photo.id}"
+
+  authorizer_id = aws_apigatewayv2_authorizer.photo_gallery.id
+  authorization_type = "JWT"
+}

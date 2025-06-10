@@ -25,3 +25,15 @@ resource "aws_s3_bucket_versioning" "artifacts" {
     status = "Enabled"
   }
 }
+
+resource "aws_s3_bucket_cors_configuration" "website" {
+  bucket = aws_s3_bucket.website.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
+    allowed_origins = ["http://localhost:5173", "https://photogallery.rumothy.com"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+}

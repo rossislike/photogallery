@@ -68,3 +68,6 @@ testing/
 
 infrastructure/lambdas/*.zip
 .env
+*.zip
+infrastructure/layer/python/*
+!infrastructure/layer/python/requirements.txt

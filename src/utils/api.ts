@@ -1,3 +1,5 @@
+import { PhotoUpload } from "../types/types"
+
 const API_URL = import.meta.env.VITE_API_URL
 
 const getAccessToken = () => {
@@ -33,4 +35,31 @@ export const getPhotos = async () => {
     },
   })
   return response.json()
+}
+
+export const uploadPhoto = async ({
+  name: fileName,
+  type,
+  file,
+}: PhotoUpload) => {
+  const response = await fetch(`${API_URL}/upload`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getAccessToken()}`,
+    },
+    body: JSON.stringify({ fileName }),
+  })
+
+  const { uploadUrl, key, imageId } = await response.json()
+  console.log("uploadUrl, key, imageId", uploadUrl, key, imageId)
+
+  await fetch(uploadUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": type,
+    },
+    body: file,
+  })
+  return { key, imageId }
 }

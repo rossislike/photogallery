@@ -23,7 +23,7 @@ resource "aws_codestarconnections_connection" "github" {
   name          = "${var.project_name}-${var.environment}-github"
   provider_type = "GitHub"
   tags          = var.tags
-  # Must be updated through the console 
+  # Must be updated through the console: CodeBuild > Settings > Connections
 }
 
 # IAM Policy for CodePipeline

@@ -1,54 +1,146 @@
-# React + TypeScript + Vite
+# Photogallery App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+# Cognito & API Gateway Test Workflow
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 1. API Gateway Test
 
-## Expanding the ESLint configuration
+- Deploy API Gateway with Terraform
+- Update `.env` with API Gateway endpoint
+- Enable CORS
+- `npm run build`
+- Upload to S3 bucket
+- Invalidate CloudFront
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 2. CloudFront Test
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- Deploy CloudFront with Terraform
+- Update `.env` with CloudFront DNS
+- Enable CORS
+- `npm run build`
+- Upload to S3 bucket
+- Invalidate CloudFront
+
+## 3. Domain Name Test
+
+- Deploy Route53 with Terraform
+- Update `.env` with domain name
+- Enable CORS
+- `npm run build`
+- Upload to S3 bucket
+- Invalidate CloudFront
+
+---
+
+## S3 Commands
+
+```sh
+aws s3 rm s3://rumo-coffeeship-client/dist --recursive
+npm run build
+aws s3 cp dist/ s3://rumo-coffeeship-client/dist --recursive
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## S3 Delete All Versions
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```sh
+aws s3api delete-objects --bucket photogallery-artifacts-g7px \
+  --delete "$(aws s3api list-object-versions \
+  --bucket photogallery-artifacts-g7px \
+  --output=json \
+  --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}')"
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+# Also remove delete markers
+aws s3api delete-objects --bucket photogallery-artifacts-g7px \
+  --delete "$(aws s3api list-object-versions \
+  --bucket photogallery-artifacts-g7px \
+  --output=json \
+  --query='{Objects: DeleteMarkers[].{Key:Key,VersionId:VersionId}}')"
+```
+
+---
+
+## Terraform Resources
+
+- `aws_apigatewayv2_route.get_photos`
+- `aws_apigatewayv2_integration.photo_gallery`
+- `aws_dynamodb_table.photogallery`
+
+---
+
+## API Usage Examples
+
+### Multipart Form Upload
+
+```sh
+curl --location 'https://0tq6ktfxxf.execute-api.us-east-1.amazonaws.com/photos' \
+  --form 'image=@"/Users/stratus/Pictures/hat.png"' \
+  --form 'title="test pic"' \
+  --form 'description="a test pic"' \
+  --form 'tags="cool,amazing, nice"'
+```
+
+### JSON Upload (Base64 Image)
+
+1. **Encode the image to base64:**
+
+   ```sh
+   base64_data=$(base64 < image.jpg | tr -d '\n')
+   ```
+
+2. **Send as JSON:**
+
+   ```sh
+   curl -X POST \
+     -H "Content-Type: application/json" \
+     -d "{\"image\": \"data:image/jpeg;base64,$base64_data\"}" \
+     https://api.example.com/upload
+   ```
+
+3. **Using jq to insert base64 into JSON:**
+
+   ```sh
+   base64_data=$(base64 < cloud.jpeg | tr -d '\n')
+   jq --arg img "data:image/jpeg;base64,$base64_data" '.image = $img' upload.json > final_upload.json
+   ```
+
+4. **Send the file:**
+
+   ```sh
+   curl -X POST \
+     -H "Content-Type: application/json" \
+     -d @final_upload.json \
+     https://0tq6ktfxxf.execute-api.us-east-1.amazonaws.com/photos
+   ```
+
+   ```sh
+   curl -X POST \
+     -H "Content-Type: application/json" \
+     -d @final_upload.json \
+     https://3szgxctg7a.execute-api.us-east-1.amazonaws.com/photos
+   ```
+
+---
+
+## Example JSON Body
+
+```json
+{
+  "body": {
+    "title": "My Image Title",
+    "description": "Detailed description here",
+    "tags": "tag1,tag2,tag3",
+    "image": "data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgA..."
+  }
+}
+```
+
+---
+
+## Python Environment Setup
+
+```sh
+python -m venv venv
+source venv/bin/activate
+pip install boto3
 ```

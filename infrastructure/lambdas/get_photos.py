@@ -3,25 +3,37 @@ import boto3
 import os
 
 bucket_name = os.environ['BUCKET_NAME']
+table_name = os.environ['PHOTOS_TABLE_NAME']
+
+dynamodb = boto3.resource('dynamodb')
 def lambda_handler(event, context):
     # Initialize the S3 client
     s3 = boto3.client('s3')
+    table = dynamodb.Table(table_name)
     
-    # Define the bucket name and prefix
-    prefix = 'photos/'
+    items = []
+    response_scan = table.scan(
+        TableName=table_name,
+        FilterExpression='begins_with(PK, :pk)',
+        ExpressionAttributeValues={
+            ':pk': 'PHOTO'
+        }
+    )
 
-    # List objects in the specified S3 bucket with the given prefix
-    response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
-
-    # Extract the photo URLs from the response
-    photos = []
-    if 'Contents' in response:
-        for obj in response['Contents']:
-            photo_url = f"https://{bucket_name}.s3.amazonaws.com/{obj['Key']}"
-            photos.append(photo_url)
-
-    # Return the list of photo URLs as a JSON response
+    items.extend(response_scan.get('Items', []))
+    for item in items:
+        signed_url = s3.generate_presigned_url(
+            'get_object', 
+            Params={
+                'Bucket':bucket_name,
+                'Key':item['image_key']
+            },
+            ExpiresIn=3600
+        )
+        item['url'] = signed_url
+        item['id'] = item['PK'].split('#')[1]
+    
     return {
         'statusCode': 200,
-        'body': json.dumps(photos)
+        'body': json.dumps(items)
     }
