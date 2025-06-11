@@ -4,6 +4,7 @@ import { Photo } from "../types/types"
 import { PhotoCard } from "./PhotoCard"
 import { AddPhotoForm } from "./AddPhotoForm"
 import { getPhotos } from "../utils/api"
+import { useAuth } from "react-oidc-context"
 
 const initialPhotos = [
   {
@@ -52,9 +53,11 @@ const initialPhotos = [
 
 const PhotoGallery = () => {
   // const [searchTerm, setSearchTerm] = useState("")
-  const [photos, setPhotos] = useState<Photo[]>(initialPhotos)
+  const [photos, setPhotos] = useState<Photo[]>(
+    initialPhotos.map((p) => ({ ...p, user: "system" }))
+  )
   const [showAddForm, setShowAddForm] = useState(false)
-
+  const auth = useAuth()
   // Sample photo data
 
   // Filter photos based on search term
@@ -63,10 +66,11 @@ const PhotoGallery = () => {
   // )
 
   useEffect(() => {
-    getPhotos().then((data) => {
-      console.log(data)
+    async function fetchPhotos() {
+      const data = await getPhotos(auth.user?.profile.email)
       setPhotos([...photos, ...data])
-    })
+    }
+    fetchPhotos()
   }, [])
 
   const handleCancel = () => {

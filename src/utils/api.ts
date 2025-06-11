@@ -26,14 +26,18 @@ export const deleteAccessToken = () => {
   }
 }
 
-export const getPhotos = async () => {
-  const response = await fetch(`${API_URL}/photos`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${getAccessToken()}`,
-    },
-  })
+export const getPhotos = async (user: string | undefined) => {
+  if (user === undefined) return []
+  const response = await fetch(
+    `${API_URL}/photos?user=${encodeURIComponent(user)}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
+    }
+  )
   return response.json()
 }
 

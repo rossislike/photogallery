@@ -11,6 +11,7 @@ def lambda_handler(event, context):
         body_str = event.get('body', '{}')
         
         image_key = body_str['image_key']
+        user = body_str['user']
         image_id = body_str['image_id']
         title = body_str['title']
         description = body_str['description']
@@ -20,10 +21,11 @@ def lambda_handler(event, context):
         dynamodb = boto3.resource('dynamodb')
         table = dynamodb.Table(table_name)
 
-        pk = f'PHOTO#{image_id}'
+        pk = f'PHOTO#{user}'
+        sk = f'PHOTO#{image_id}'
         item = {
             'PK': pk,
-            'SK': pk,
+            'SK': sk,
             'image_key': image_key,
             'title': title,
             'dateAdded': datetime.now().isoformat()

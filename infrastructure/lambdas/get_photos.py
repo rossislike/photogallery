@@ -7,17 +7,25 @@ table_name = os.environ['PHOTOS_TABLE_NAME']
 
 dynamodb = boto3.resource('dynamodb')
 def lambda_handler(event, context):
-    # Initialize the S3 client
+    query_parameters = event.get('queryStringParameters', {}) or {}
+    user = query_parameters.get('user', '')
+    
+    if not user:
+        return {
+            'statusCode': 400,
+            'body': json.dumps({'error': 'User parameter is required'})
+        }
+
     s3 = boto3.client('s3')
     table = dynamodb.Table(table_name)
     
     items = []
-    response_scan = table.scan(
-        TableName=table_name,
-        FilterExpression='begins_with(PK, :pk)',
+    response_scan = table.query(
         ExpressionAttributeValues={
-            ':pk': 'PHOTO'
-        }
+            ':pk': f'PHOTO#{user}'
+        },
+        KeyConditionExpression='PK = :pk',
+        TableName=table_name,
     )
 
     items.extend(response_scan.get('Items', []))

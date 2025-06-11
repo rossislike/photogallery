@@ -1,5 +1,6 @@
 export interface Photo {
   id?: string
+  user: string
   url: string
   title?: string
   description?: string

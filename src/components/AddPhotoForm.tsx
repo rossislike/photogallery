@@ -2,6 +2,7 @@ import { Camera, X } from "lucide-react"
 import { useState } from "react"
 import { Photo, PhotoUpload } from "../types/types"
 import { uploadPhoto } from "../utils/api"
+import { useAuth } from "react-oidc-context"
 
 const initialInputData = {
   url: "",
@@ -25,6 +26,8 @@ export function AddPhotoForm({
   const [photoUpload, setPhotoUpload] = useState<PhotoUpload | undefined>(
     undefined
   )
+  const auth = useAuth()
+  // console.log(auth.user?.profile)
 
   const handleImageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -50,6 +53,10 @@ export function AddPhotoForm({
       alert("Please fill in all required fields.")
       return
     }
+    if (!auth.user?.profile.email) {
+      alert("Please login to add a photo.")
+      return
+    }
 
     uploadPhoto(photoUpload).then((data) => {
       console.log(data)
@@ -57,6 +64,7 @@ export function AddPhotoForm({
 
     const photo: Photo = {
       id: `${photos.length + 1}`,
+      user: auth.user?.profile.email,
       title: newPhoto.title,
       description: newPhoto.description,
       tags: newPhoto.tags
@@ -69,6 +77,7 @@ export function AddPhotoForm({
     setPhotos((prev) => [photo, ...prev])
   }
 
+  if (auth.isLoading) return <div>Loading...</div>
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
