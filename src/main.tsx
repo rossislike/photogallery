@@ -3,7 +3,6 @@ import "./index.css"
 import App from "./App.tsx"
 import { Route, BrowserRouter, Routes } from "react-router-dom"
 import { AuthProvider } from "react-oidc-context"
-import { AddPhoto } from "./components/AddPhoto.tsx"
 
 const USER_POOL_ID = import.meta.env.VITE_USER_POOL_ID
 const CLIENT_ID = import.meta.env.VITE_CLIENT_ID
@@ -22,7 +21,6 @@ createRoot(document.getElementById("root")!).render(
     <AuthProvider {...cognitoAuthConfig}>
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="/add-photo" element={<AddPhoto />} />
       </Routes>
     </AuthProvider>
   </BrowserRouter>

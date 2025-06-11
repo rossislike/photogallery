@@ -56,7 +56,7 @@ export function AddPhotoForm({
     })
 
     const photo: Photo = {
-      id: photos.length + 1,
+      id: `${photos.length + 1}`,
       title: newPhoto.title,
       description: newPhoto.description,
       tags: newPhoto.tags
